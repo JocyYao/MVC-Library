@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.dao.MyRepository;
+import com.example.dto.LibRequest;
+import com.example.exception.BookNotFoundException;
 import com.example.model.Library;
 
 @Service
@@ -16,10 +18,10 @@ public class LibraryServiceImpl implements LibraryService{
 	MyRepository repo;
 	
 	@Override
-	public Library createBk(Library book) {
+	public Library createBk(LibRequest libRequest) {
 		// TODO Auto-generated method stub
-		repo.save(book);
-		return book;
+		Library book = Library.build(libRequest.getId(), libRequest.getAuthor(),libRequest.getTitle(), libRequest.getCost());
+		return repo.save(book);
 	}
 
 	@Override
@@ -29,18 +31,29 @@ public class LibraryServiceImpl implements LibraryService{
 	}
 
 	@Override
-	public Library updateBk(Library book) {
+	public Library updateBk(LibRequest libRequest) throws BookNotFoundException{
 		// TODO Auto-generated method stub
-		Library b1 = repo.findById(book.getId()).orElse(null);
-		b1.setAuthor(book.getAuthor());
-		b1.setCost(book.getCost());
-		b1.setTitle(book.getTitle());
-		return repo.save(b1);
+		
+		if (repo.findById(libRequest.getId()).orElse(null) != null) {
+			Library b = Library.build(libRequest.getId(), libRequest.getAuthor(),libRequest.getTitle(), libRequest.getCost());	
+			return repo.save(b);
+		}else{
+			throw new BookNotFoundException("book not found");
+		}
+		
+		
 	}
 	
-	public Object findById(Integer id) {
+	@Override
+	public Optional<Library> findById(Integer id) throws BookNotFoundException{
 		// TODO Auto-generated method stub
-		return repo.findById(id).orElse(null);
+		Optional<Library> book = repo.findById(id);
+		if (book != null) {
+			return book;
+		}else {
+			throw new BookNotFoundException("book not found");
+		}
+		
 	}
 
 

@@ -3,6 +3,8 @@ package com.example.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -10,9 +12,13 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.dto.LibRequest;
+import com.example.exception.BookNotFoundException;
 import com.example.model.Library;
 import com.example.service.LibraryService;
 import com.example.service.LibraryServiceImpl;
+import javax.validation.Valid;
+
 
 @RestController
 public class LibraryController {
@@ -21,9 +27,9 @@ public class LibraryController {
 	LibraryService ls;
 	
 	@PostMapping("/create")
-	public Library createBk(@RequestBody Library bk) {
+	public ResponseEntity<Library> createBk(@RequestBody @Valid LibRequest lr) {
 		System.out.println("create");
-		return ls.createBk(bk);
+		return new ResponseEntity<>(ls.createBk(lr), HttpStatus.CREATED);
 		
 	}
 	
@@ -34,15 +40,22 @@ public class LibraryController {
 		
 	}
 	
+	@GetMapping("/findById/{x}")
+	public List<Library> findByID(@PathVariable Integer id) {
+		System.out.println("read");
+		return ls.readAllBk();
+		
+	}
+	
 	@PutMapping("/update")
-	public Library updateBk(@RequestBody Library bk) {
+	public Library updateBk(@RequestBody @Valid LibRequest lr) throws BookNotFoundException {
 		System.out.println("update");
-		return ls.updateBk(bk);
+		return ls.updateBk(lr);
 	}
 	
 	
 	@PutMapping("/delete/{id}")
-	public void deleteBk(@PathVariable Integer id) {
+	public void deleteBk(@PathVariable Integer id) throws BookNotFoundException {
 		System.out.println("delete");
 		ls.deleteBk(id);
 	}

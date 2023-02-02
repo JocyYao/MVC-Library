@@ -7,5 +7,5 @@ import com.example.model.Library;
 
 @Repository
 public interface MyRepository extends JpaRepository<Library, Integer>{
-
+	Library findById(int id);
 }
